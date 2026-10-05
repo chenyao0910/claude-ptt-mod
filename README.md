@@ -8,7 +8,9 @@
 
 Claude 在跑測試、改檔案的時候,你不用切到瀏覽器:面板就在對話旁邊,看看盤後閒聊、刷一下八卦。老闆經過?按 `b`,整個面板瞬間變成一堆編譯 log。
 
-![看板文章列表](docs/images/ptt-list.svg)
+![左邊是 Claude Code 的對話,右邊是 PTT 面板](docs/images/session.png)
+
+<sub>實際使用畫面:左邊照常跟 Claude 對話,右邊的 PTT 面板正在看八卦板文章。截圖中的使用者資訊和推文 IP 已遮蔽。</sub>
 
 ## 什麼是 Claude Code mod?
 
@@ -124,6 +126,8 @@ claude plugin uninstall ptt@claude-ptt-mod   # 移除
 ```
 
 ## 畫面
+
+![看板文章列表](docs/images/ptt-list.svg)
 
 | 文章內頁 | 管理看板 |
 | --- | --- |

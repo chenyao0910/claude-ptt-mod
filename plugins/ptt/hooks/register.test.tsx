@@ -14,7 +14,7 @@ const ARTICLE = `<div id="main-content" class="bbs-screen bbs-content"><div clas
 all in 台積電
 --
 <div class="push"><span class="hl push-tag">推 </span><span class="f3 hl push-userid">carol</span><span class="f3 push-content">: 跟</span><span class="push-ipdatetime"> 10/06 09:01
-</span></div><div class="push"><span class="f1 hl push-tag">噓 </span><span class="f3 hl push-userid">dave</span><span class="f3 push-content">: 反指標</span><span class="push-ipdatetime"> 10/06 09:02
+</span></div><div class="push"><span class="f1 hl push-tag">噓 </span><span class="f3 hl push-userid">dave</span><span class="f3 push-content">: 反指標</span><span class="push-ipdatetime"> 1.2.3.4 10/06 09:02
 </span></div></div>`
 
 // PTT 上存在的看板,key 為小寫,value 為正式名稱
@@ -71,6 +71,9 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(await pane.find({ type: 'Text', text: /all in 台積電/ })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: '推 1' })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: '噓 1' })).toBeDefined()
+    // 推文的 IP 不顯示
+    expect(await pane.find({ type: 'Text', text: /1\.2\.3\.4/ })).toBeUndefined()
+    expect(await pane.find({ type: 'Text', text: '10/06 09:02' })).toBeDefined()
 
     await pane.press({ key: 'boss' })
     expect(await pane.find({ type: 'Text', text: /webpack/ })).toBeDefined()

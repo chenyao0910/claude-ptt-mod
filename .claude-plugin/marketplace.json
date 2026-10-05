@@ -10,7 +10,7 @@
       "name": "ptt",
       "source": "./plugins/ptt",
       "description": "在 Claude Code 面板裡滑 PTT,可自訂看板,附老闆鍵",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }

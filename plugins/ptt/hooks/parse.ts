@@ -32,6 +32,11 @@ export function parseIndex(html: string): { posts: Post[]; prevPage: string; boa
   return { posts: posts.reverse(), prevPage, boardName }
 }
 
+// 有些看板(例如八卦板)推文會附 IP,面板只顯示日期時間
+export function pushTime(raw: string): string {
+  return raw.match(/\d{1,2}\/\d{1,2}(?:\s+\d{1,2}:\d{2})?\s*$/)?.[0].trim() ?? raw
+}
+
 export function parseArticle(url: string, html: string): Article {
   const start = html.indexOf('<div id="main-content"')
   const main = start >= 0 ? html.slice(start) : html
@@ -44,7 +49,7 @@ export function parseArticle(url: string, html: string): Article {
   const pushes: Push[] = [...main.matchAll(/<div class="push">([\s\S]*?)<\/div>/g)].map(m => {
     const p = m[1] ?? ''
     const span = (cls: string) => stripTags(p.match(new RegExp(`<span[^>]*${cls}[^>]*>([\\s\\S]*?)</span>`))?.[1] ?? '').trim()
-    return { tag: span('push-tag'), user: span('push-userid'), text: span('push-content').replace(/^:\s*/, ''), time: span('push-ipdatetime') }
+    return { tag: span('push-tag'), user: span('push-userid'), text: span('push-content').replace(/^:\s*/, ''), time: pushTime(span('push-ipdatetime')) }
   })
   return {
     url,
