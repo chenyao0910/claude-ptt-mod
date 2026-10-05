@@ -2,6 +2,8 @@
 
 在 [Claude Code](https://claude.com/claude-code) 的面板裡滑 PTT。等 Claude 跑任務的空檔順便看一下盤後閒聊,老闆經過就按一個鍵切成假 log。
 
+![看板文章列表](docs/images/ptt-list.svg)
+
 ## 功能
 
 - 看板文章列表:推文數上色(爆 / 10+ / 一般 / X),一路往前載入更舊的文章
@@ -9,6 +11,18 @@
 - 自訂看板:新增、移除、恢復預設,關掉 Claude Code 再開還在
 - 老闆鍵:一鍵把面板換成一堆看起來很忙的編譯和測試 log
 - 免登入,八卦版的「已滿 18 歲」確認自動處理
+
+## 畫面
+
+| 文章內頁 | 管理看板 |
+| --- | --- |
+| ![文章內頁:標題、作者、內文、推噓統計與推文](docs/images/ptt-article.svg) | ![管理看板:移除、新增、恢復預設](docs/images/ptt-manage.svg) |
+
+**老闆鍵**:按一下,整個面板變成看起來很忙的 log。
+
+![老闆鍵畫面](docs/images/ptt-boss.svg)
+
+> 圖片是照面板排版畫的示意圖,列表和文章用的是 PTT Stock 板的實際資料。實際顏色會依你的終端機配色而不同。
 
 ## 需求
 
@@ -69,6 +83,13 @@ claude plugin test plugins/ptt
 
 ```sh
 claude --plugin-dir ./plugins/ptt
+```
+
+重新產生 README 的圖片(用 PTT 現在的資料):
+
+```sh
+npx tsx scripts/dump-live.mts Stock > /tmp/live.json
+python3 scripts/make-screenshots.py /tmp/live.json
 ```
 
 ## 授權

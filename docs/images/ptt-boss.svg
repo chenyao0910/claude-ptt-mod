@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="641" height="302" viewBox="0 0 641 302">
+<rect width="100%" height="100%" rx="10" fill="#1a1b26"/>
+<rect width="100%" height="36" rx="10" fill="#24283b"/>
+<rect y="26" width="100%" height="10" fill="#24283b"/>
+<circle cx="20" cy="18.0" r="6" fill="#ff5f56"/>
+<circle cx="40" cy="18.0" r="6" fill="#ffbd2e"/>
+<circle cx="60" cy="18.0" r="6" fill="#27c93f"/>
+<text x="320" y="23.0" fill="#6b7089" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="13" text-anchor="middle">Claude Code — PTT</text>
+<text x="18.0" y="64" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="462.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  webpack 5.98.0 compiled successfully in 2384 ms</text>
+<text x="18.0" y="84" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="285.6" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  ✓ 412 modules transformed.</text>
+<text x="18.0" y="104" fill="#6b7089" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="537.6" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[debug] resolving dependency graph for @internal/payment-gateway</text>
+<text x="18.0" y="124" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="512.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  running migration 20261006_add_index_on_orders ... ok</text>
+<text x="18.0" y="144" fill="#e0af68" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="512.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[warn]  deprecated: Buffer() is deprecated, use Buffer.from()</text>
+<text x="18.0" y="164" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="512.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  PASS  src/services/__tests__/ledger.test.ts (3.214 s)</text>
+<text x="18.0" y="184" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="546.0" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  PASS  src/services/__tests__/settlement.test.ts (2.871 s)</text>
+<text x="18.0" y="204" fill="#6b7089" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="453.6" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[debug] cache hit ratio 0.93 (hits=18231, misses=1374)</text>
+<text x="18.0" y="224" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="302.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  Tests: 128 passed, 128 total</text>
+<text x="18.0" y="244" fill="#c0caf5" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="302.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">[info]  watching for file changes...</text>
+<text x="18.0" y="264" fill="#6b7089" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans Mono CJK TC', monospace" font-size="14" textLength="8.4" lengthAdjust="spacingAndGlyphs" xml:space="preserve">_</text>
+</svg>
