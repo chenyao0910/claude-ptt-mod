@@ -1,0 +1,16 @@
+{
+  "name": "claude-ptt-mod",
+  "description": "Claude Code 的 PTT 面板 mod",
+  "owner": {
+    "name": "chenyao0910",
+    "email": "chenyao0910@smail.nchu.edu.tw"
+  },
+  "plugins": [
+    {
+      "name": "ptt",
+      "source": "./plugins/ptt",
+      "description": "在 Claude Code 面板裡滑 PTT,可自訂看板,附老闆鍵",
+      "version": "0.1.0"
+    }
+  ]
+}

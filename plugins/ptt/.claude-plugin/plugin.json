@@ -1,0 +1,13 @@
+{
+  "name": "ptt",
+  "version": "0.1.0",
+  "description": "在 Claude Code 面板裡滑 PTT,可自訂看板,附老闆鍵",
+  "author": {
+    "name": "chenyao0910",
+    "email": "chenyao0910@smail.nchu.edu.tw"
+  },
+  "homepage": "https://github.com/chenyao0910/claude-ptt-mod",
+  "repository": "https://github.com/chenyao0910/claude-ptt-mod",
+  "license": "MIT",
+  "types": "./types/index.d.ts"
+}

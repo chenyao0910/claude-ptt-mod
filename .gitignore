@@ -1,0 +1,4 @@
+# Claude Code 載入 plugin 時自動產生的型別檔
+.claude-plugin/types/
+plugins/*/.claude-plugin/types/
+.DS_Store
