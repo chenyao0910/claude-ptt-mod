@@ -122,6 +122,34 @@ function nrecColor(n: string): string | undefined {
   return undefined
 }
 
+// 標題拆成「Re: / Fw:」、分類標籤、其餘文字,標籤依分類上色
+function splitTitle(title: string): { prefix: string; tag: string; rest: string } {
+  const m = title.match(/^((?:Re|Fw|R|轉):\s*)?\[([^\]]{1,6})\]\s*(.*)$/i)
+  if (!m) return { prefix: '', tag: '', rest: title }
+  return { prefix: (m[1] ?? '').trim(), tag: m[2] ?? '', rest: m[3] || title }
+}
+
+const TAG_COLORS: Record<string, string> = {
+  新聞: 'cyan',
+  標的: 'magenta',
+  請益: 'green',
+  問卦: 'green',
+  情報: 'yellow',
+  心得: 'blue',
+  閒聊: 'blueBright',
+  討論: 'blueBright',
+  爆卦: 'red',
+  公告: 'red',
+  分享: 'yellowBright',
+}
+const tagColor = (tag: string) => TAG_COLORS[tag.trim()] ?? 'white'
+
+function statusColor(msg: string): string {
+  if (msg.startsWith('讀取中')) return 'yellow'
+  if (msg.startsWith('已')) return 'green'
+  return 'red'
+}
+
 const pushColor = (tag: string) => (tag.startsWith('推') ? 'green' : tag.startsWith('噓') ? 'red' : undefined)
 
 // 老闆鍵畫面:看起來很忙的假 log
@@ -172,7 +200,7 @@ export const register: Register = on => {
     if (m === 'boss') {
       return (
         <Box flexDirection="column">
-          {FAKE_LOG.map((line, i) => (
+          {FAKE_LOG.map(line => (
             <Text dimColor={line.startsWith('[debug]')} color={line.startsWith('[warn]') ? 'yellow' : undefined}>
               {line}
             </Text>
@@ -185,34 +213,18 @@ export const register: Register = on => {
     const name = await read($, board)
     const list = await read($, boards)
     const isEditing = await read($, editing)
-    const toolbar = (
-      <Box key="toolbar" flexDirection="row" flexWrap="wrap" columnGap={1}>
-        {list.map(b => (
-          <Button key={`board-${b}`} plain={b === name ? undefined : true} label={b} onPress={() => void loadBoard($, b)} />
-        ))}
-        <Button key="refresh" hotkey="r" label="重新整理" onPress={() => void loadBoard($, name)} />
-        <Button key="edit" hotkey="e" label={isEditing ? '完成' : '管理看板'} onPress={() => void update($, editing, v => !v)} />
-        <Button key="boss" hotkey="b" label="老闆鍵" onPress={() => void toggleBoss($)} />
+    const width = Math.max(20, Math.min(e.props.bodyColumns, 100))
+    const divider = <Text color="blue" dimColor>{'─'.repeat(width)}</Text>
+
+    const header = (
+      <Box key="header" flexDirection="row" columnGap={1}>
+        <Text backgroundColor="blue" color="white" bold>{' PTT '}</Text>
+        <Text dimColor>批踢踢實業坊 ›</Text>
+        <Text color="yellow" bold>{m === 'article' ? `${name} › 文章` : name}</Text>
       </Box>
     )
 
-    const manage = isEditing && (
-      <Box key="manage" flexDirection="column" borderStyle="round" paddingX={1}>
-        {list.length === 0 && <Text dimColor>清單是空的,新增一個看板吧</Text>}
-        {list.map(b => (
-          <Box key={`row-${b}`} flexDirection="row" columnGap={1}>
-            <Text>{b}</Text>
-            <Button key={`remove-${b}`} plain label="✕ 移除" onPress={() => void removeBoard($, b)} />
-          </Box>
-        ))}
-        {'Input' in ui ? (
-          <ui.Input key="add-board" label="新增看板" placeholder="輸入看板英文名稱,例如 NBA,按 Enter" onSubmit={(v: string) => void addBoard($, v)} />
-        ) : (
-          <Text dimColor>新增看板:輸入 /ptt add 看板名稱</Text>
-        )}
-        <Button key="reset" plain label="恢復預設看板" onPress={() => void resetBoards($)} />
-      </Box>
-    )
+    const statusLine = msg !== '' && <Text color={statusColor(msg)}>{msg}</Text>
 
     if (m === 'article') {
       const a = await read($, article)
@@ -221,24 +233,40 @@ export const register: Register = on => {
         const bad = a.pushes.filter(p => p.tag.startsWith('噓')).length
         const body = a.body.length > MAX_BODY ? `${a.body.slice(0, MAX_BODY)}\n…(內文太長,後面省略)` : a.body
         const shown = a.pushes.slice(-MAX_PUSHES)
+        const t = splitTitle(a.title)
         return (
           <Box flexDirection="column" gap={1}>
+            {header}
             <Box key="nav" flexDirection="row" columnGap={1}>
-              <Button key="back" hotkey="h" label="← 回列表" onPress={() => void update($, mode, () => 'list')} />
-              <Button key="boss" hotkey="b" label="老闆鍵" onPress={() => void toggleBoss($)} />
+              <Button key="back" hotkey="h" variant="primary" label="← 回列表" onPress={() => void update($, mode, () => 'list')} />
+              <Button key="boss" hotkey="b" variant="secondary" label="老闆鍵" onPress={() => void toggleBoss($)} />
             </Box>
-            <Box key="head" flexDirection="column">
-              <Text bold>{a.title}</Text>
-              <Text dimColor>{`${a.author} · ${a.time}`}</Text>
+            <Box key="head" flexDirection="column" borderStyle="round" borderColor="blue" paddingX={1}>
+              <Box key="title-row" flexDirection="row" columnGap={1}>
+                {t.prefix !== '' && <Text dimColor>{t.prefix}</Text>}
+                {t.tag !== '' && <Text color={tagColor(t.tag)} bold>{`[${t.tag}]`}</Text>}
+                <Text bold>{t.rest}</Text>
+              </Box>
+              <Box key="meta-row" flexDirection="row" columnGap={1}>
+                <Text dimColor>作者</Text>
+                <Text color="cyan">{a.author}</Text>
+                <Text dimColor>{`· ${a.time}`}</Text>
+              </Box>
             </Box>
             <Text wrap="wrap">{body}</Text>
-            <Text dimColor>{`推 ${good} · 噓 ${bad} · 共 ${a.pushes.length} 則${shown.length < a.pushes.length ? `(只顯示最後 ${shown.length} 則)` : ''}`}</Text>
+            {divider}
+            <Box key="score" flexDirection="row" columnGap={1}>
+              <Text color="green" bold>{`推 ${good}`}</Text>
+              <Text color="red" bold>{`噓 ${bad}`}</Text>
+              <Text dimColor>{`共 ${a.pushes.length} 則${shown.length < a.pushes.length ? `(只顯示最後 ${shown.length} 則)` : ''}`}</Text>
+            </Box>
             <Box key="pushes" flexDirection="column">
               {shown.map((p, i) => (
                 <Box key={`push${i}`} flexDirection="row" columnGap={1}>
-                  <Text color={pushColor(p.tag)}>{p.tag}</Text>
+                  <Text color={pushColor(p.tag)} bold>{p.tag}</Text>
                   <Text color="yellow">{p.user}</Text>
                   <Text wrap="wrap">{p.text}</Text>
+                  <Text dimColor>{p.time}</Text>
                 </Box>
               ))}
             </Box>
@@ -247,24 +275,78 @@ export const register: Register = on => {
       }
     }
 
+    // 看板一列、操作一列,中間用線分開
+    const boardRow = (
+      <Box key="boards" flexDirection="row" flexWrap="wrap" columnGap={1}>
+        <Text color="cyan" bold>看板</Text>
+        {list.map(b => (
+          <Button
+            key={`board-${b}`}
+            variant={b === name ? 'primary' : undefined}
+            plain={b === name ? undefined : true}
+            label={b}
+            onPress={() => void loadBoard($, b)}
+          />
+        ))}
+      </Box>
+    )
+    const actionRow = (
+      <Box key="actions" flexDirection="row" flexWrap="wrap" columnGap={1}>
+        <Text color="magenta" bold>操作</Text>
+        <Button key="refresh" hotkey="r" variant="secondary" label="重新整理" onPress={() => void loadBoard($, name)} />
+        <Button key="edit" hotkey="e" variant={isEditing ? 'primary' : 'secondary'} label={isEditing ? '完成' : '管理看板'} onPress={() => void update($, editing, v => !v)} />
+        <Button key="boss" hotkey="b" variant="secondary" label="老闆鍵" onPress={() => void toggleBoss($)} />
+      </Box>
+    )
+
+    const manage = isEditing && (
+      <Box key="manage" flexDirection="column" borderStyle="round" borderColor="cyan" paddingX={1}>
+        <Text color="cyan" bold>管理看板</Text>
+        {list.length === 0 && <Text dimColor>清單是空的,新增一個看板吧</Text>}
+        {list.map(b => (
+          <Box key={`row-${b}`} flexDirection="row" columnGap={1}>
+            <Text color="yellow">{b}</Text>
+            <Button key={`remove-${b}`} plain label="✕ 移除" hover={{ color: 'red', bold: true }} onPress={() => void removeBoard($, b)} />
+          </Box>
+        ))}
+        {'Input' in ui ? (
+          <ui.Input key="add-board" label="新增看板" placeholder="輸入看板英文名稱,例如 NBA,按 Enter" onSubmit={(v: string) => void addBoard($, v)} />
+        ) : (
+          <Text dimColor>新增看板:輸入 /ptt add 看板名稱</Text>
+        )}
+        <Button key="reset" plain dimColor label="恢復預設看板" onPress={() => void resetBoards($)} />
+      </Box>
+    )
+
     const items = await read($, posts)
     const older = await read($, prevPage)
     return (
       <Box flexDirection="column" gap={1}>
-        {toolbar}
+        {header}
+        <Box key="controls" flexDirection="column">
+          {boardRow}
+          {divider}
+          {actionRow}
+        </Box>
         {manage}
-        {msg !== '' && <Text dimColor>{msg}</Text>}
+        {statusLine}
         <Box key="list" flexDirection="column">
           {items.length === 0 && msg === '' && <Markdown key="empty" text="_還沒載入,按上面的看板或「重新整理」_" />}
-          {items.map(p => (
-            <Box key={p.url} flexDirection="row" columnGap={1}>
-              <Text color={nrecColor(p.nrec)}>{p.nrec.padStart(2, ' ') || '  '}</Text>
-              <Button key={`open-${p.url}`} plain label={p.title} onPress={() => void openArticle($, p.url)} />
-              <Text dimColor wrap="truncate">{`${p.author} ${p.date}`}</Text>
-            </Box>
-          ))}
+          {items.map(p => {
+            const t = splitTitle(p.title)
+            return (
+              <Box key={p.url} flexDirection="row" columnGap={1}>
+                <Text color={nrecColor(p.nrec)} bold>{p.nrec.padStart(2, ' ') || '  '}</Text>
+                {t.prefix !== '' && <Text dimColor>{t.prefix}</Text>}
+                {t.tag !== '' && <Text color={tagColor(t.tag)}>{`[${t.tag}]`}</Text>}
+                <Button key={`open-${p.url}`} plain label={t.rest} hover={{ color: 'cyan', bold: true }} onPress={() => void openArticle($, p.url)} />
+                <Text color="cyan" dimColor wrap="truncate">{p.author}</Text>
+                <Text dimColor>{p.date}</Text>
+              </Box>
+            )
+          })}
         </Box>
-        {older !== '' && <Button key="older" hotkey="n" label="載入更舊的文章" onPress={() => void loadBoard($, name, older)} />}
+        {older !== '' && <Button key="older" hotkey="n" variant="secondary" label="載入更舊的文章" onPress={() => void loadBoard($, name, older)} />}
       </Box>
     )
   })

@@ -66,9 +66,11 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(await pane.find({ key: 'older' })).toBeDefined()
 
     await pane.press({ key: 'open-/bbs/Stock/M.1.A.AAA.html' })
-    expect(await pane.find({ type: 'Text', text: '[標的] 台積電 多' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '[標的]' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '台積電 多' })).toBeDefined()
     expect(await pane.find({ type: 'Text', text: /all in 台積電/ })).toBeDefined()
-    expect(await pane.find({ type: 'Text', text: /推 1 · 噓 1/ })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '推 1' })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: '噓 1' })).toBeDefined()
 
     await pane.press({ key: 'boss' })
     expect(await pane.find({ type: 'Text', text: /webpack/ })).toBeDefined()
@@ -76,7 +78,7 @@ for (const surface of ['terminal', 'desktop'] as const) {
     expect(await pane.find({ type: 'Text', text: /all in 台積電/ })).toBeDefined()
 
     await pane.press({ key: 'back' })
-    expect(await pane.find({ key: 'toolbar' })).toBeDefined()
+    expect(await pane.find({ key: 'controls' })).toBeDefined()
   })
 }
 
