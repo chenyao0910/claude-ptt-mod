@@ -279,15 +279,16 @@ export const register: Register = on => {
     const boardRow = (
       <Box key="boards" flexDirection="row" flexWrap="wrap" columnGap={1}>
         <Text color="cyan" bold>看板</Text>
-        {list.map(b => (
+        {list.flatMap((b, i) => [
+          ...(i > 0 ? [<Text dimColor>|</Text>] : []),
           <Button
             key={`board-${b}`}
             variant={b === name ? 'primary' : undefined}
             plain={b === name ? undefined : true}
             label={b}
             onPress={() => void loadBoard($, b)}
-          />
-        ))}
+          />,
+        ])}
       </Box>
     )
     const actionRow = (
