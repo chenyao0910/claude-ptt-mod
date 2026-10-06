@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>claude-ptt-mod:在 Claude Code 裡滑 PTT 的 mod(附老闆鍵)</title>
+<meta name="description" content="claude-ptt-mod 是一個 Claude Code mod,在 Claude Code 終端機裡開 PTT 面板:看板文章列表、推噓上色、自訂看板,還有一鍵切成假 log 的老闆鍵。免登入、兩行指令安裝、MIT 開源。">
+<meta name="keywords" content="Claude Code, Claude Code mod, Claude Code plugin, PTT, 批踢踢, 終端機 PTT, 老闆鍵, 摸魚">
+<meta name="author" content="chenyao0910">
+<link rel="canonical" href="https://chenyao0910.github.io/claude-ptt-mod/">
+<meta name="theme-color" content="#f3f0e8">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="claude-ptt-mod">
+<meta property="og:title" content="在 Claude Code 裡滑 PTT:claude-ptt-mod">
+<meta property="og:description" content="Claude 在左邊寫 code,你在右邊滑 PTT。老闆經過按 b,面板瞬間變成編譯 log。">
+<meta property="og:url" content="https://chenyao0910.github.io/claude-ptt-mod/">
+<meta property="og:image" content="https://chenyao0910.github.io/claude-ptt-mod/images/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="左邊是 Claude Code 的對話,右邊是 PTT 面板">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="在 Claude Code 裡滑 PTT:claude-ptt-mod">
+<meta name="twitter:description" content="Claude 在左邊寫 code,你在右邊滑 PTT。老闆經過按 b,面板瞬間變成編譯 log。">
+<meta name="twitter:image" content="https://chenyao0910.github.io/claude-ptt-mod/images/og.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "claude-ptt-mod",
+  "alternateName": "PTT for Claude Code",
+  "description": "在 Claude Code 終端機裡開 PTT 面板的 Claude Code mod:看板文章列表、推噓上色、自訂看板、老闆鍵。",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS, Linux, Windows",
+  "inLanguage": "zh-Hant-TW",
+  "softwareVersion": "0.1.1",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://chenyao0910.github.io/claude-ptt-mod/",
+  "codeRepository": "https://github.com/chenyao0910/claude-ptt-mod",
+  "image": "https://chenyao0910.github.io/claude-ptt-mod/images/og.png",
+  "screenshot": "https://chenyao0910.github.io/claude-ptt-mod/images/session.png",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "TWD" },
+  "author": { "@type": "Person", "name": "chenyao0910", "url": "https://github.com/chenyao0910" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Claude Code 可以看 PTT 嗎?",
+      "acceptedAnswer": { "@type": "Answer", "text": "可以。安裝 claude-ptt-mod 之後,在 Claude Code 輸入 /ptt 就會開出 PTT 面板,可以看看板文章列表、文章內容和推文,不用切到瀏覽器。" }
+    },
+    {
+      "@type": "Question",
+      "name": "什麼是 Claude Code mod?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Claude Code mod 是用 function hooks 寫的 Claude Code plugin,可以直接改 Claude Code 自己的介面,例如畫面板、顯示 toast、改狀態列或攔截工具呼叫。claude-ptt-mod 就是用面板功能做的 mod。" }
+    },
+    {
+      "@type": "Question",
+      "name": "需要登入 PTT 帳號嗎?",
+      "acceptedAnswer": { "@type": "Answer", "text": "不需要。claude-ptt-mod 讀的是 PTT 網頁版 www.ptt.cc 的公開頁面,八卦板的滿 18 歲確認會自動處理。目前只能看文章,不能推文或發文。" }
+    },
+    {
+      "@type": "Question",
+      "name": "要怎麼安裝 claude-ptt-mod?",
+      "acceptedAnswer": { "@type": "Answer", "text": "需要 Claude Code 2.1.289 以上。在終端機執行 claude plugin marketplace add chenyao0910/claude-ptt-mod,再執行 claude plugin install ptt@claude-ptt-mod,接著在 Claude Code 裡輸入 /ptt。" }
+    },
+    {
+      "@type": "Question",
+      "name": "可以換成自己常逛的看板嗎?",
+      "acceptedAnswer": { "@type": "Answer", "text": "可以。在面板按「管理看板」新增或移除,或用 /ptt add 看板名稱、/ptt remove 看板名稱。清單會存下來,下次開 Claude Code 還在。" }
+    },
+    {
+      "@type": "Question",
+      "name": "老闆鍵是什麼?",
+      "acceptedAnswer": { "@type": "Answer", "text": "面板取得焦點時按 b,整個 PTT 面板會換成一堆看起來很忙的編譯和測試 log;再按一次 b 就回到剛剛看的文章。" }
+    }
+  ]
+}
+</script>
+
+<style>
+  :root {
+    --paper: #f3f0e8;
+    --paper-2: #ebe7dc;
+    --ink: #0f1513;
+    --ink-2: #3c4541;
+    --muted: #6d746f;
+    --line: #d6d1c4;
+    --accent: #b8512e;
+    --accent-soft: #f0d8cb;
+    --term: #0e1412;
+    --term-2: #161e1b;
+    --term-line: #26302c;
+    --term-fg: #d9e1dc;
+    --term-dim: #7d8a84;
+    --t-yellow: #e7b75f;
+    --t-green: #8fd16a;
+    --t-red: #f2737e;
+    --t-cyan: #6fd0e6;
+    --t-magenta: #c3a0f5;
+    --t-blue: #7ea6f5;
+    --t-orange: #f0a37f;
+    --shadow: #cfd3cc;
+    --sans: Inter, "Noto Sans TC", -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, "Noto Sans TC", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 17px; line-height: 1.7;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  img { max-width: 100%; height: auto; display: block; }
+  code, pre, kbd { font-family: var(--mono); }
+  p code, li code, td code, summary code {
+    font-size: .86em; background: var(--paper-2); border: 1px solid var(--line);
+    padding: .05em .4em; border-radius: 4px;
+  }
+  kbd {
+    font-size: .8em; font-weight: 500; display: inline-block; min-width: 1.7em; text-align: center;
+    padding: .05em .45em; border: 1px solid var(--ink); border-radius: 4px;
+    box-shadow: 0 2px 0 var(--ink); background: #fff; line-height: 1.5;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px; }
+
+  /* 導覽 */
+  nav .wrap {
+    display: flex; align-items: center; gap: 28px; height: 72px;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; text-decoration: none; letter-spacing: -.01em; }
+  .logo {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--ink); color: var(--paper);
+    display: grid; place-items: center; font-family: var(--mono); font-size: 13px; font-weight: 700;
+  }
+  nav ul { list-style: none; display: flex; gap: 28px; margin: 0 0 0 auto; padding: 0; }
+  nav ul a { text-decoration: none; font-size: 15px; font-weight: 600; }
+  nav ul a:hover { color: var(--accent); }
+
+  /* 主視覺 */
+  .hero { padding: 96px 0 104px; }
+  .hero .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 12.5px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .eyebrow .dot { width: 9px; height: 9px; border-radius: 50%; border: 2.5px solid var(--ink); }
+  h1 {
+    font-size: clamp(40px, 5.6vw, 68px); line-height: 1.05; font-weight: 900;
+    letter-spacing: -.045em; margin: 22px 0 26px;
+  }
+  h1 .em { color: var(--accent); }
+  .nb { white-space: nowrap; }
+  .lead { font-size: 19px; color: var(--ink-2); max-width: 30em; margin: 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    font-weight: 700; font-size: 15px; padding: 12px 20px; border-radius: 4px;
+    border: 1.5px solid var(--ink); transition: transform .12s, box-shadow .12s;
+  }
+  .btn.solid { background: var(--ink); color: var(--paper); }
+  .btn.ghost { background: transparent; }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--accent); }
+  .flow {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 34px;
+    font-family: var(--mono); font-size: 13.5px; color: var(--ink-2);
+  }
+  .flow .chip {
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--ink);
+    border: 1.5px solid var(--ink); padding: 5px 12px; background: #fff;
+    box-shadow: 3px 3px 0 var(--accent-soft);
+  }
+  .flow .chip .logo { width: 20px; height: 20px; border-radius: 5px; font-size: 9px; }
+
+  /* 終端機卡片 */
+  .term {
+    background: var(--term); color: var(--term-fg); border-radius: 10px;
+    box-shadow: 16px 16px 0 var(--shadow); overflow: hidden; font-family: var(--mono);
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 7px; padding: 12px 16px;
+    border-bottom: 1px solid var(--term-line); font-size: 12.5px; color: var(--term-dim);
+  }
+  .term-bar i { width: 10px; height: 10px; border-radius: 50%; background: #3a4440; }
+  .term-bar span { margin: 0 auto; padding-right: 44px; }
+  .step { padding: 20px 22px; border-bottom: 1px solid var(--term-line); }
+  .step-h { display: flex; align-items: center; gap: 10px; font-family: var(--sans); font-weight: 700; font-size: 15px; color: #fff; }
+  .num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--t-orange); color: var(--term);
+    display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 700;
+  }
+  .cmd {
+    margin-top: 12px; display: flex; align-items: flex-start; gap: 12px;
+    background: var(--term-2); border: 1px solid var(--term-line); border-radius: 6px; padding: 11px 12px 11px 14px;
+  }
+  .cmd pre { margin: 0; flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 1.75; color: #fff; }
+  .cmd pre .p { color: var(--term-dim); user-select: none; }
+  .copy {
+    flex: none; font: 600 11.5px var(--sans); color: var(--term-fg); background: transparent; cursor: pointer;
+    border: 1px solid #4a5651; border-radius: 4px; padding: 3px 9px;
+  }
+  .copy:hover { border-color: var(--term-fg); color: #fff; }
+
+  /* 互動 demo:PTT 面板 */
+  .demo { padding: 16px 18px 18px; background: #12171f; font-size: 12.5px; line-height: 1.75; min-height: 262px; }
+  .demo .row { display: flex; gap: 8px; white-space: nowrap; overflow: hidden; }
+  .demo .title { overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; color: var(--term-fg); }
+  .demo .hd { margin-bottom: 8px; }
+  .demo .tag-ptt { background: #3d59a1; color: #fff; font-weight: 700; padding: 0 5px; }
+  .demo .sep { border-top: 1px solid #2a3350; margin: 6px 0 8px; }
+  .demo .hint { margin-top: 10px; color: var(--term-dim); font-family: var(--sans); font-size: 12.5px; }
+  .demo .hint kbd { background: #1d2430; color: #fff; border-color: #5b6680; box-shadow: 0 2px 0 #5b6680; }
+  .c-y { color: var(--t-yellow); } .c-g { color: var(--t-green); } .c-r { color: var(--t-red); }
+  .c-c { color: var(--t-cyan); } .c-m { color: var(--t-magenta); } .c-b { color: var(--t-blue); }
+  .c-o { color: var(--t-orange); } .c-d { color: var(--term-dim); } .b { font-weight: 700; }
+  .demo[data-mode="boss"] .ptt-view, .demo[data-mode="ptt"] .boss-view { display: none; }
+
+  /* 區塊共用 */
+  section { padding: 104px 0; border-top: 1px solid var(--line); }
+  .label {
+    font-family: var(--mono); font-size: 12.5px; font-weight: 700; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 18px;
+  }
+  h2 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.08; font-weight: 900; letter-spacing: -.04em; margin: 0 0 20px; }
+  h3 { font-size: 19px; font-weight: 700; letter-spacing: -.01em; margin: 0 0 8px; }
+  .intro { color: var(--ink-2); font-size: 18px; max-width: 36em; margin: 0; }
+  .split { display: grid; grid-template-columns: 5fr 7fr; gap: 72px; align-items: start; }
+
+  /* 截圖 */
+  .shot { padding-top: 0; border-top: 0; }
+  .shot figure { margin: 0; }
+  .shot img { border-radius: 10px; border: 1.5px solid var(--ink); box-shadow: 16px 16px 0 var(--shadow); }
+  .shot figcaption { margin-top: 30px; font-size: 14px; color: var(--muted); display: flex; gap: 10px; }
+  .shot figcaption b { flex: none; color: var(--ink); font-family: var(--mono); font-size: 12px; letter-spacing: .1em; }
+
+  /* 功能 */
+  .features { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 56px; border-top: 1.5px solid var(--ink); }
+  .feature { padding: 26px 26px 6px 0; }
+  .feature + .feature { padding-left: 26px; border-left: 1px solid var(--line); }
+  .feature .n { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--accent); display: block; margin-bottom: 18px; }
+  .feature p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+
+  /* mod 對照表 */
+  .spec { border-top: 1.5px solid var(--ink); }
+  .spec div { display: grid; grid-template-columns: 180px 1fr; gap: 20px; padding: 16px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
+  .spec dt { font-family: var(--mono); font-size: 13.5px; font-weight: 700; padding-top: 2px; }
+  .spec dd { margin: 0; color: var(--ink-2); }
+  .note { margin-top: 24px; color: var(--ink-2); font-size: 16px; }
+  .note a { color: var(--accent); font-weight: 600; }
+
+  /* 教學 */
+  ol.tutorial { list-style: none; margin: 56px 0 0; padding: 0; counter-reset: s; border-top: 1.5px solid var(--ink); }
+  ol.tutorial > li {
+    counter-increment: s; display: grid; grid-template-columns: 96px 1fr; gap: 24px;
+    padding: 32px 0; border-bottom: 1px solid var(--line);
+  }
+  ol.tutorial > li::before {
+    content: counter(s, decimal-leading-zero); font-family: var(--mono); font-weight: 700;
+    font-size: 28px; letter-spacing: -.02em; color: var(--accent); line-height: 1.1;
+  }
+  ol.tutorial > li > div { min-width: 0; }
+  ol.tutorial p { margin: 4px 0 0; color: var(--ink-2); }
+  ol.tutorial pre {
+    margin: 16px 0 0; background: var(--term); color: #fff; border-radius: 6px;
+    padding: 14px 18px; overflow-x: auto; font-size: 14px; line-height: 1.8; max-width: 760px;
+  }
+  ol.tutorial pre .c { color: var(--term-dim); }
+  .keys { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 16px; color: var(--ink-2); font-size: 15px; }
+  .aside { margin-top: 14px; font-size: 15px; color: var(--ink-2); padding-left: 14px; border-left: 3px solid var(--accent); max-width: 760px; }
+
+  /* 畫面 */
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 40px 36px; margin-top: 56px; }
+  .gallery figure { margin: 0; min-width: 0; }
+  .gallery img { border-radius: 8px; border: 1.5px solid var(--ink); box-shadow: 8px 8px 0 var(--shadow); }
+  .gallery figcaption { margin-top: 18px; font-size: 14.5px; font-weight: 600; }
+  .gallery figcaption span { color: var(--muted); font-weight: 400; }
+
+  /* 常見問題 */
+  .faq { border-top: 1.5px solid var(--ink); }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    cursor: pointer; list-style: none; padding: 22px 0; font-weight: 700; font-size: 17.5px;
+    display: flex; justify-content: space-between; gap: 24px; letter-spacing: -.01em;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; font-family: var(--mono); font-weight: 400; font-size: 22px; line-height: 1; color: var(--accent); }
+  .faq details[open] summary::after { content: "−"; }
+  .faq details p { margin: -6px 0 24px; color: var(--ink-2); max-width: 44em; }
+
+  footer .wrap {
+    display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between;
+    padding-top: 26px; padding-bottom: 40px; border-top: 1px solid var(--line);
+    font-size: 13.5px; color: var(--ink-2);
+  }
+  footer a { font-weight: 600; }
+
+  @media (max-width: 960px) {
+    .hero { padding: 64px 0 80px; }
+    .hero .wrap, .split { grid-template-columns: 1fr; gap: 56px; }
+    .features { grid-template-columns: 1fr 1fr; }
+    .feature:nth-child(3) { padding-left: 0; border-left: 0; }
+    .gallery { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .wrap { padding: 0 20px; }
+    nav ul li:not(:last-child) { display: none; }
+    section { padding: 72px 0; }
+    .term, .shot img { box-shadow: 8px 8px 0 var(--shadow); }
+    .features { grid-template-columns: 1fr; }
+    .feature, .feature + .feature { padding: 22px 0 6px; border-left: 0; }
+    .feature + .feature { border-top: 1px solid var(--line); }
+    .spec div { grid-template-columns: 1fr; gap: 4px; }
+    ol.tutorial > li { grid-template-columns: 1fr; gap: 10px; }
+    .demo { font-size: 11.5px; }
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="主要導覽">
+  <div class="wrap">
+    <a class="brand" href="#"><span class="logo">ptt</span>claude-ptt-mod</a>
+    <ul>
+      <li><a href="#tutorial">教學</a></li>
+      <li><a href="#faq">常見問題</a></li>
+      <li><a href="https://github.com/chenyao0910/claude-ptt-mod">GitHub ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Open source · Claude Code mod</span>
+        <h1><span class="nb">Claude Code</span><br>裡也能<span class="em nb">滑 PTT。</span></h1>
+        <p class="lead">Claude 在左邊寫 code,你在右邊看盤後閒聊。老闆經過?按 <kbd>b</kbd>,整個面板瞬間變成編譯 log。</p>
+        <div class="actions">
+          <a class="btn solid" href="https://github.com/chenyao0910/claude-ptt-mod">在 GitHub 上看 ↗</a>
+          <a class="btn ghost" href="#tutorial">三分鐘教學</a>
+        </div>
+        <div class="flow" aria-label="運作方式:PTT 經過 claude-ptt-mod 進到 Claude Code">
+          <span>ptt.cc</span><span>→</span>
+          <span class="chip"><span class="logo">ptt</span>claude-ptt-mod</span>
+          <span>→</span><span>Claude Code 面板</span>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-bar"><i></i><i></i><i></i><span>開始使用</span></div>
+        <div class="step">
+          <div class="step-h"><span class="num">1</span>安裝</div>
+          <div class="cmd">
+<pre id="install"><span class="p">$ </span>claude plugin marketplace add chenyao0910/claude-ptt-mod
+<span class="p">$ </span>claude plugin install ptt@claude-ptt-mod</pre>
+            <button class="copy" type="button" data-copy="install">複製</button>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="num">2</span>在 Claude Code 裡打開</div>
+          <div class="cmd">
+<pre id="open"><span class="p">&gt; </span>/ptt</pre>
+            <button class="copy" type="button" data-copy="open">複製</button>
+          </div>
+        </div>
+        <div class="demo" id="demo" data-mode="ptt" aria-label="PTT 面板示範,按 b 切換老闆鍵">
+          <div class="ptt-view">
+            <div class="row hd"><span class="tag-ptt">PTT</span><span class="c-d">批踢踢實業坊 ›</span><span class="c-y b">Stock</span></div>
+            <div class="row"><span class="c-c b">看板</span><span class="c-o b">[ Stock ]</span><span class="c-d">|</span><span>Gossiping</span><span class="c-d">|</span><span>Tech_Job</span><span class="c-d">|</span><span>NBA</span></div>
+            <div class="sep"></div>
+            <div class="row"><span class="c-y b">78</span><span class="c-y">[情報]</span><span class="title">115年10月05日信用交易統計</span><span class="c-c">steward135</span></div>
+            <div class="row"><span class="c-y b">47</span><span class="c-g">[請益]</span><span class="title">超商股退場時機</span><span class="c-c">snowyfat</span></div>
+            <div class="row"><span class="c-y b">19</span><span class="c-g">[請益]</span><span class="title">請問面對理論正確,實際績效不好怎麼調適?</span><span class="c-c">Turisa</span></div>
+            <div class="row"><span class="c-y b">19</span><span class="c-m">[標的]</span><span class="title">6525捷敏 漲價+產能滿載 底部進場多</span><span class="c-c">bcp01</span></div>
+            <div class="row"><span class="c-g b">&nbsp;5</span><span class="c-y">[情報]</span><span class="title">2026/10/05 注意處置股清單</span><span class="c-c">ho83leo</span></div>
+            <div class="row"><span class="c-g b">&nbsp;3</span><span class="c-c">[新聞]</span><span class="title">針對中國?遭狂輸劣質水泥 宏都拉斯火大</span><span class="c-c">Su22</span></div>
+          </div>
+          <div class="boss-view">
+            <div class="row">[info]  webpack 5.98.0 compiled successfully in 2384 ms</div>
+            <div class="row">[info]  ✓ 412 modules transformed.</div>
+            <div class="row c-d">[debug] resolving dependency graph for @internal/payment-gateway</div>
+            <div class="row">[info]  running migration 20261006_add_index_on_orders ... ok</div>
+            <div class="row c-y">[warn]  deprecated: Buffer() is deprecated, use Buffer.from()</div>
+            <div class="row">[info]  PASS  src/services/__tests__/ledger.test.ts (3.214 s)</div>
+            <div class="row">[info]  Tests: 128 passed, 128 total</div>
+            <div class="row">[info]  watching for file changes...</div>
+          </div>
+          <div class="hint">試試看:在這個頁面按 <kbd>b</kbd>,或<button class="copy" type="button" id="boss" style="margin-left:6px;color:#fff">切換老闆鍵</button></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="shot" aria-label="實際使用畫面">
+    <div class="wrap">
+      <figure>
+        <img src="images/session.png" width="1920" height="1050"
+             alt="Claude Code 實際畫面:左邊是跟 Claude 的對話,右邊是 PTT 面板,正在看八卦板文章與推文">
+        <figcaption><b>實際畫面</b>左邊照常跟 Claude 對話,右邊的 PTT 面板正在看八卦板。使用者資訊和推文 IP 已遮蔽。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <p class="label">功能</p>
+      <h2>不用開瀏覽器,<br>PTT 就在你寫 code 的地方。</h2>
+      <div class="features">
+        <div class="feature">
+          <span class="n">01</span>
+          <h3>看板文章列表</h3>
+          <p>推文數依熱度上色,[新聞]、[標的]、[請益] 等分類各有顏色,可以一路往前翻。</p>
+        </div>
+        <div class="feature">
+          <span class="n">02</span>
+          <h3>文章與推文</h3>
+          <p>完整內文、推噓統計,推文依推、噓、→ 上色,不顯示推文 IP。</p>
+        </div>
+        <div class="feature">
+          <span class="n">03</span>
+          <h3>自訂看板</h3>
+          <p>新增、移除、恢復預設。板名打小寫會自動修正,清單下次開還在。</p>
+        </div>
+        <div class="feature">
+          <span class="n">04</span>
+          <h3>老闆鍵</h3>
+          <p>按 <kbd>b</kbd>,面板換成 webpack 和測試通過的假 log,再按一次回到原本的文章。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="what">
+    <div class="wrap split">
+      <div>
+        <p class="label">什麼是 mod</p>
+        <h2>不只是 plugin,<br>是改 Claude Code 本身。</h2>
+      </div>
+      <div>
+        <p class="intro">一般 plugin 提供 skill、指令或工具給 Claude 用。<strong>mod</strong> 則是用 function hooks 直接改 Claude Code 自己的介面:畫面板、加 toast、改狀態列、攔截工具呼叫。這個 mod 用到了:</p>
+        <dl class="spec" style="margin-top:32px">
+          <div><dt>Pane</dt><dd>PTT 文章列表、文章內頁、老闆鍵畫面</dd></div>
+          <div><dt>Slash command</dt><dd><code>/ptt</code>、<code>/ptt add</code>、<code>/ptt remove</code></dd></div>
+          <div><dt>Hotkey</dt><dd><kbd>b</kbd> 老闆鍵、<kbd>r</kbd> 重新整理、<kbd>n</kbd> 載入更舊</dd></div>
+          <div><dt>$.store</dt><dd>跨 session 記住你的看板清單</dd></div>
+          <div><dt>$.http.fetch</dt><dd>讀取 PTT 網頁版</dd></div>
+        </dl>
+        <p class="note">全部大約 300 行 TypeScript,在 <a href="https://github.com/chenyao0910/claude-ptt-mod/tree/main/plugins/ptt/hooks">plugins/ptt/hooks/</a>。想學寫 Claude Code mod,可以從這裡看起。</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="tutorial">
+    <div class="wrap">
+      <p class="label">教學</p>
+      <h2>從安裝到老闆鍵,三分鐘。</h2>
+      <ol class="tutorial">
+        <li><div>
+          <h3>確認 Claude Code 版本</h3>
+<pre>claude --version   <span class="c"># 需要 2.1.289 以上,太舊就執行 claude update</span></pre>
+        </div></li>
+        <li><div>
+          <h3>安裝</h3>
+          <p>在終端機執行,不是在 Claude Code 的對話裡。第一行加入 plugin 來源,第二行安裝 mod。</p>
+<pre>claude plugin marketplace add chenyao0910/claude-ptt-mod
+claude plugin install ptt@claude-ptt-mod</pre>
+        </div></li>
+        <li><div>
+          <h3>叫出 PTT 面板</h3>
+          <p>啟動 <code>claude</code>。如果本來就開著,先執行 <code>/reload-plugins</code>。</p>
+<pre>/ptt              <span class="c"># 打開面板,預設 Stock 板</span>
+/ptt Gossiping    <span class="c"># 直接開某個看板</span></pre>
+          <p class="aside">終端機寬一點比較好看,建議 144 欄以上。</p>
+        </div></li>
+        <li><div>
+          <h3>看文章</h3>
+          <p>滑鼠點標題就能打開。用鍵盤的話,先按 <kbd>ctrl</kbd> <kbd>x</kbd> 再按 <kbd>tab</kbd> 讓面板取得焦點。</p>
+          <div class="keys">
+            <span><kbd>b</kbd> 老闆鍵</span><span><kbd>r</kbd> 重新整理</span><span><kbd>n</kbd> 載入更舊</span>
+            <span><kbd>h</kbd> 回列表</span><span><kbd>e</kbd> 管理看板</span>
+          </div>
+          <p class="aside">面板有焦點時,打的字會給面板。想回去跟 Claude 講話,點一下輸入框,或再按一次 <kbd>ctrl</kbd> <kbd>x</kbd> <kbd>tab</kbd>。</p>
+        </div></li>
+        <li><div>
+          <h3>換成你常逛的看板</h3>
+          <p>按「管理看板」(或 <kbd>e</kbd>)移除和新增,或用指令。板名不分大小寫,打錯會直接告訴你。</p>
+<pre>/ptt add NBA
+/ptt remove Soft_Job</pre>
+        </div></li>
+        <li><div>
+          <h3>老闆來了</h3>
+          <p>按 <kbd>b</kbd>,面板立刻變成編譯 log。再按一次,或點最下面灰色的 <code>_</code>,回到剛剛看的地方。</p>
+        </div></li>
+        <li><div>
+          <h3>更新與移除</h3>
+<pre>claude plugin update ptt@claude-ptt-mod
+claude plugin uninstall ptt@claude-ptt-mod</pre>
+        </div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="screens">
+    <div class="wrap">
+      <p class="label">畫面</p>
+      <h2>每個畫面長這樣。</h2>
+      <p class="intro">照面板實際排版繪製,資料來自 PTT Stock 板。顏色會依你的終端機配色而不同。</p>
+      <div class="gallery">
+        <figure>
+          <img src="images/ptt-list.svg" loading="lazy" alt="PTT 面板的看板文章列表:推文數與分類標籤上色,上方是看板切換和操作按鈕">
+          <figcaption>看板文章列表 <span>· 推文數與分類上色</span></figcaption>
+        </figure>
+        <figure>
+          <img src="images/ptt-article.svg" loading="lazy" alt="PTT 面板的文章內頁:標題、作者、內文、推噓統計與推文">
+          <figcaption>文章內頁 <span>· 推噓統計與推文</span></figcaption>
+        </figure>
+        <figure>
+          <img src="images/ptt-manage.svg" loading="lazy" alt="管理看板:移除看板、輸入新看板名稱、恢復預設">
+          <figcaption>管理看板 <span>· 新增、移除、恢復預設</span></figcaption>
+        </figure>
+        <figure>
+          <img src="images/ptt-boss.svg" loading="lazy" alt="老闆鍵畫面:看起來像編譯和測試輸出的假 log">
+          <figcaption>老闆鍵 <span>· 一鍵切換</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap split">
+      <div>
+        <p class="label">常見問題</p>
+        <h2>你可能想問。</h2>
+      </div>
+      <div class="faq">
+        <details open>
+          <summary>Claude Code 可以看 PTT 嗎?</summary>
+          <p>可以。安裝 claude-ptt-mod 之後,在 Claude Code 輸入 <code>/ptt</code> 就會開出 PTT 面板,可以看看板文章列表、文章內容和推文,不用切到瀏覽器。</p>
+        </details>
+        <details>
+          <summary>什麼是 Claude Code mod?跟一般 plugin 有什麼不同?</summary>
+          <p>一般 plugin 多半是提供 skill、指令或 MCP 工具給 Claude 用;mod 則是用 function hooks 改 Claude Code 自己的介面,例如畫面板、顯示 toast、改狀態列。claude-ptt-mod 就是用面板功能做的 mod。</p>
+        </details>
+        <details>
+          <summary>需要登入 PTT 帳號嗎?</summary>
+          <p>不需要。它讀的是 PTT 網頁版 <code>www.ptt.cc</code> 的公開頁面,八卦板的滿 18 歲確認會自動處理。目前只能看文章,不能推文或發文。</p>
+        </details>
+        <details>
+          <summary>會一直在背景抓 PTT 嗎?</summary>
+          <p>不會。只有你打開看板、點文章或按重新整理時才會讀取,對 PTT 的負擔跟用瀏覽器看差不多。</p>
+        </details>
+        <details>
+          <summary>可以換成自己常逛的看板嗎?</summary>
+          <p>可以。在面板按「管理看板」新增或移除,或用 <code>/ptt add 看板名稱</code>、<code>/ptt remove 看板名稱</code>。清單會存下來,下次開 Claude Code 還在。</p>
+        </details>
+        <details>
+          <summary>為什麼有些長文或爆文看不完整?</summary>
+          <p>Claude Code 的面板一次能畫的字數有上限,所以內文超過 6000 字會截斷,推文只顯示最後 150 則。</p>
+        </details>
+        <details>
+          <summary>老闆鍵真的不會被發現嗎?</summary>
+          <p>假 log 看起來像 webpack 編譯和測試通過的輸出,遠看很像在認真工作。近看就不保證了。</p>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>MIT licensed · by <a href="https://github.com/chenyao0910">chenyao0910</a> · 非 PTT 或 Anthropic 官方專案</span>
+    <span>Built for 摸魚. <a href="https://github.com/chenyao0910/claude-ptt-mod/issues">回報問題</a></span>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('[data-copy]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = document.getElementById(btn.dataset.copy).innerText.replace(/^[$>] /gm, '')
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = '已複製'
+        setTimeout(function () { btn.textContent = '複製' }, 1600)
+      })
+    })
+  })
+
+  // 頁面上的老闆鍵 demo:按 b 或按鈕切換
+  var demo = document.getElementById('demo')
+  function toggleBoss() { demo.dataset.mode = demo.dataset.mode === 'ptt' ? 'boss' : 'ptt' }
+  document.getElementById('boss').addEventListener('click', toggleBoss)
+  document.addEventListener('keydown', function (e) {
+    var t = e.target.tagName
+    if (e.key === 'b' && !e.metaKey && !e.ctrlKey && !e.altKey && t !== 'INPUT' && t !== 'TEXTAREA') toggleBoss()
+  })
+</script>
+</body>
+</html>
