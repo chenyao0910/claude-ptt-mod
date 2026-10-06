@@ -6,6 +6,8 @@
 ![Claude Code 2.1.289+](https://img.shields.io/badge/Claude_Code-2.1.289%2B-555)
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue)
 
+🌐 **網站:<https://chenyao0910.github.io/claude-ptt-mod/>**(可以在網頁上試玩老闆鍵)
+
 Claude 在跑測試、改檔案的時候,你不用切到瀏覽器:面板就在對話旁邊,看看盤後閒聊、刷一下八卦。老闆經過?按 `b`,整個面板瞬間變成一堆編譯 log。
 
 ![左邊是 Claude Code 的對話,右邊是 PTT 面板](docs/images/session.png)
